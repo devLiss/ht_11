@@ -13,6 +13,7 @@ export const commentsCollection = client.db("ht_03").collection("comments");
 export const sessionCollection = client.db("ht_03").collection("sessions");
 export const requestCollection = client.db("ht_03").collection("requests");
 export const tokensBlackListCollection = client.db("ht_03").collection("tokens");
+export const likesCollection = client.db("ht_03").collection("likes");
 
 export async function runDB(){
     try {

@@ -42,3 +42,13 @@ export const postBlogIdValidation = body('blogId')
                                     .trim()
                                     .isLength({min:1, max:35}).withMessage('Поле должно быть строкой')
                                     .custom(isBlogIdValid)
+
+const isLikeStatusCorrect: CustomValidator = async value => {
+    const likeStatus = ["None","Like","Dislike"]
+    const includeFlag = likeStatus.includes(value)
+    if (!includeFlag) {
+        throw new Error('Некорректный LikeStatus')
+    }
+    return true
+}
+export const likeStatusValidation = body('likeStatus').trim().isLength({min:1}).custom(isLikeStatusCorrect)

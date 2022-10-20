@@ -3,11 +3,22 @@ import {commentService} from "../domain/comments-service";
 import {authMiddleware} from "../middlewares/authMiddleware";
 import {body} from "express-validator";
 import {inputValidationMiddleware} from "../middlewares/inputValidationMiddleware";
+import {likeStatusValidation} from "../middlewares/middlewares";
 
 export const commentsRouter = Router({})
 
-commentsRouter.get('/:id',async(req:Request, res:Response)=>{
-    const comment = await commentService.getCommentByID(req.params.id)
+
+commentsRouter.put('/:commentId/like-status',authMiddleware, likeStatusValidation, inputValidationMiddleware, async (req:Request, res:Response)=>{
+    //@ts-ignore
+    console.log(req.user)
+    //@ts-ignore
+    await commentService.makeLike(req.params.commentId, req.user!.id!, req.body.likeStatus)
+
+    res.sendStatus(204)
+})
+commentsRouter.get('/:id',authMiddleware,async(req:Request, res:Response)=>{
+    //@ts-ignore
+    const comment = await commentService.getCommentByID(req.params.id, req.user.id)
     if(!comment){
         res.send(404)
         return
