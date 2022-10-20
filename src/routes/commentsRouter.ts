@@ -26,7 +26,8 @@ commentsRouter.get('/:id',authMiddleware,async(req:Request, res:Response)=>{
     res.status(200).send(comment)
 })
 commentsRouter.delete('/:commentId',authMiddleware, async(req:Request, res:Response)=>{
-    const comment = await commentService.getCommentByID(req.params.commentId);
+    //@ts-ignore
+    const comment = await commentService.getCommentByID(req.params.commentId, req.user.id);
     if(!comment){
         res.send(404)
         return
@@ -41,7 +42,8 @@ commentsRouter.delete('/:commentId',authMiddleware, async(req:Request, res:Respo
     res.send(204)
 })
 commentsRouter.put('/:commentId',authMiddleware,body('content').trim().isLength({min:20, max:300}),inputValidationMiddleware,async(req:Request, res:Response)=>{
-    const comment = await commentService.getCommentByID(req.params.commentId);
+    //@ts-ignore
+    const comment = await commentService.getCommentByID(req.params.commentId, req.user.id);
     if(!comment){
         res.send(404)
         return
