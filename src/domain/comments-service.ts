@@ -19,20 +19,6 @@ export const commentService = {
     },
 
     async getCommentByID(id:string, currentUserId:ObjectId){
-        /*
-        * {
-              "id": "string",
-              "content": "string",
-              "userId": "string",
-              "userLogin": "string",
-              "createdAt": "2022-10-20T20:09:28.266Z",
-              "likesInfo": {
-                "likesCount": 0,
-                "dislikesCount": 0,
-                "myStatus": "None"
-              }
-            }
-        * */
         const comment = await commentRepo.getCommentById(id);
         if(comment){
             const likeInfo = await likesDbRepo.getLikesAndDislikesByCommentId(id)

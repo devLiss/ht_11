@@ -25,7 +25,7 @@ postsRouter.get('/', pageNumberSanitizer, pageSizeSanitizer, sortBySanitizer,sor
     const data = await postService.findAllPosts(+req.query.pageNumber!, +req.query.pageSize!,req.query.sortBy,req.query.sortDirection);
     res.status(200).send(data);
 })
-postsRouter.post('/', authGuard, postTitleValidation,postShortDescrValidation, postContentValidation, postBlogIdValidation,inputValidationMiddleware, async (req: Request, res: Response) => {
+postsRouter.post('/', authMiddleware, postTitleValidation,postShortDescrValidation, postContentValidation, postBlogIdValidation,inputValidationMiddleware, async (req: Request, res: Response) => {
     const post = await postService.createPost(req.body.title,
         req.body.shortDescription,
         req.body.content,
