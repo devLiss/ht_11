@@ -97,7 +97,7 @@ export const commentRepo = {
                     userLogin: 1,
                     createdAt: 1,
                     "likesInfo.likesCount": "$likesCount",
-                    "likesInfo.dislikesCount": "$dislikesCount.dislikesCount",
+                    "likesInfo.dislikesCount": "$dislikesCount",
                     "likesInfo.myStatus":"$myStatus"
                 }
             }])
@@ -112,7 +112,7 @@ export const commentRepo = {
 
                 const likesInfo = {
                     likesCount: likesCountArr.length ? likesCountArr[0].count : 0,
-                    dislikesCount: dislikesCountArr.length ? dislikesCountArr[0].count : 5,
+                    dislikesCount: dislikesCountArr.length ? dislikesCountArr[0].count : 0,
                     myStatus: myStatusArr.length ? myStatusArr[0].status : "None"
                 }
                 comment.likesInfo = likesInfo
