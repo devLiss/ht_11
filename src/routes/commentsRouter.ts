@@ -12,8 +12,10 @@ commentsRouter.put('/:commentId/like-status',authMiddleware, likeStatusValidatio
     //@ts-ignore
     console.log(req.user)
     //@ts-ignore
-    await commentService.makeLike(req.params.commentId, req.user!.id!, req.body.likeStatus)
-
+    const result = await commentService.makeLike(req.params.commentId, req.user!.id!, req.body.likeStatus)
+    if(!result){
+        res.sendStatus(404)
+    }
     res.sendStatus(204)
 })
 commentsRouter.get('/:id',authMiddleware,async(req:Request, res:Response)=>{

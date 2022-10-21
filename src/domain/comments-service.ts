@@ -53,6 +53,9 @@ export const commentService = {
         console.log("USERID")
         console.log(userId)
         const existedLike = await likesDbRepo.getLikeByCommentIdAndUserId(commentId,userId)
+        if(!existedLike){
+            return null
+        }
         const likeInfo:{commentId:ObjectId, userId:ObjectId, status:string} = {
             commentId:commentIdDb,
             userId,
