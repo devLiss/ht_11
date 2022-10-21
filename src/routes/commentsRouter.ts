@@ -38,7 +38,7 @@ commentsRouter.get('/:id',/*authMiddleware,*/async(req:Request, res:Response)=>{
     //@ts-ignore
     const comment = await commentService.getCommentByID(req.params.id,currentUserId)
     if(!comment){
-        res.send(404)
+        res.sendStatus(404)
         return
     }
     res.status(200).send(comment)
