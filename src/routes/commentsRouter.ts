@@ -5,6 +5,7 @@ import {body} from "express-validator";
 import {inputValidationMiddleware} from "../middlewares/inputValidationMiddleware";
 import {likeStatusValidation} from "../middlewares/middlewares";
 import {jwtService} from "../application/jwt-service";
+import {userService} from "../domain/user-service";
 import {ObjectId} from "mongodb";
 
 export const commentsRouter = Router({})
@@ -33,7 +34,7 @@ commentsRouter.get('/:id',/*authMiddleware,*/async(req:Request, res:Response)=>{
 
         // @ts-ignore
         const user = await userService.getUserById(userId);
-        currentUserId = user.id
+        if(user){currentUserId = user.id}
     }
     //@ts-ignore
     const comment = await commentService.getCommentByID(req.params.id,currentUserId)
