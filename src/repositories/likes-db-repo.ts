@@ -2,7 +2,7 @@ import {likesCollection} from "./db";
 import {ObjectId} from "mongodb";
 
 export const likesDbRepo = {
-   async createLike(like:{commentId:ObjectId, userId:ObjectId, status:string}){
+    async createLike(like:{commentId:ObjectId, userId:ObjectId, status:string}){
         return await likesCollection.insertOne(like);
         },
     async updateLike(like:{commentId:ObjectId, userId:ObjectId, status:string}){
@@ -13,7 +13,10 @@ export const likesDbRepo = {
        return await likesCollection.findOne({commentId:new ObjectId(commentId), userId:userId});
     },
     async getLikesAndDislikesByCommentId(commentId:string){
-        const counts = await likesCollection.aggregate([{$match:{commentId:new ObjectId(commentId)}},{$group:{_id:"$status",count:{$sum:1}}}]).toArray();
+        const counts = await likesCollection.aggregate([
+            {$match:{commentId:new ObjectId(commentId)}},
+            {$group:{_id:"$status",count:{$sum:1}}}]
+        ).toArray();
         return counts;
    }
 }

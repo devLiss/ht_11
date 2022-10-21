@@ -22,13 +22,75 @@ export const commentRepo = {
         return result.matchedCount === 1
     },
     async getCommentsByPostId(postId:string,pageNumber:number,pageSize:number, sortBy:string, sortDirection:any){
-        const comments = await commentsCollection.find({postId:new ObjectId(postId)},
+        /*const comments = await commentsCollection.find({postId:new ObjectId(postId)},
             {projection:{_id:0,
                 id:"$_id",
                 content:1,
                 userId:1,
                 userLogin:1,
                 createdAt:1}})
+            .skip((pageNumber-1)*pageSize)
+            .limit(pageSize)
+            .sort( {[sortBy] : sortDirection} )
+            .toArray();*/
+
+        const comments = await commentsCollection.aggregate([{
+            $lookup: {
+                from: "likes",
+                localField: "_id",
+                foreignField: "commentId",
+                pipeline: [{
+                    $match: {
+                        "status": "Like"
+                    },
+                },
+                    {
+                        $group: {_id:"$status", count:{$sum:1}}
+                    }
+                ],
+                as: "likesCount"
+            }
+        },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "commentId",
+                    pipeline:  [{
+                        $match: {
+                            "status": "Dislike"
+                        },
+                    },
+                        {
+                            $count: "dislikesCount"
+                        }
+                    ],
+                    as: "dislikesCount"
+                }
+            },
+            {
+                $lookup: {
+                    from: "likes",
+                    localField: "_id",
+                    foreignField: "commentId",
+                    pipeline: [{
+                        $group: { _id: "$status", count: { $sum: 1 } }
+                    }],
+                    as: "likeInfo.myStatus"
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    //id: "$_id",
+                    content: 1,
+                    userId: 1,
+                    userLogin: 1,
+                    createdAt: 1,
+                    "likeInfo.likesCount": "$likesCount",
+                    "likeInfo.dislikesCount": "$dislikesCount.dislikesCount"
+                }
+            }])
             .skip((pageNumber-1)*pageSize)
             .limit(pageSize)
             .sort( {[sortBy] : sortDirection} )

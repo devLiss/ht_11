@@ -4,6 +4,8 @@ import {authMiddleware} from "../middlewares/authMiddleware";
 import {body} from "express-validator";
 import {inputValidationMiddleware} from "../middlewares/inputValidationMiddleware";
 import {likeStatusValidation} from "../middlewares/middlewares";
+import {jwtService} from "../application/jwt-service";
+import {ObjectId} from "mongodb";
 
 export const commentsRouter = Router({})
 
@@ -21,9 +23,20 @@ commentsRouter.put('/:commentId/like-status',authMiddleware, likeStatusValidatio
     const result = await commentService.makeLike(req.params.commentId, req.user!.id!, req.body.likeStatus)
     res.sendStatus(204)
 })
-commentsRouter.get('/:id',authMiddleware,async(req:Request, res:Response)=>{
+commentsRouter.get('/:id',/*authMiddleware,*/async(req:Request, res:Response)=>{
+    let currentUserId = null;// user.id
+    if(req.headers.authorization) {
+        const token = req.headers.authorization.split(' ')[1]
+        console.log(token)
+        const userId = await jwtService.getUserByAccessToken(token);
+        console.log("UserId = " + userId)
+
+        // @ts-ignore
+        const user = await userService.getUserById(userId);
+        currentUserId = user.id
+    }
     //@ts-ignore
-    const comment = await commentService.getCommentByID(req.params.id, req.user.id)
+    const comment = await commentService.getCommentByID(req.params.id,currentUserId)
     if(!comment){
         res.send(404)
         return
