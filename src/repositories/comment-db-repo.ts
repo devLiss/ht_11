@@ -6,7 +6,14 @@ export const commentRepo = {
 
         await commentsCollection.insertOne(comment)
         const findedComment = await commentsCollection.findOne({_id:comment._id},{projection:{_id:0, id:"$_id", userId:1, userLogin:1, content:1, createdAt:1}})
-        console.log(findedComment)
+        //console.log(findedComment)
+        if(findedComment){
+        findedComment.likesInfo = {
+            likesCount:  0,
+            dislikesCount: 0,
+            myStatus: "None"
+        }
+        }
         return findedComment;
     },
 
