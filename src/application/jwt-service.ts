@@ -16,8 +16,8 @@ export const jwtService = {
     },*/
 
     async generateTokens(userId:any, deviceId:string){
-        const token = jwt.sign({userId:userId}, settings.JWT_SECRET, {expiresIn:'10m'})
-        const refreshToken = jwt.sign({deviceId:deviceId,userId:userId}, settings.JWT_REFRESH_SECRET, {expiresIn:'15m'})
+        const token = jwt.sign({userId:userId}, settings.JWT_SECRET, {expiresIn:'1h'})
+        const refreshToken = jwt.sign({deviceId:deviceId,userId:userId}, settings.JWT_REFRESH_SECRET, {expiresIn:'2h'})
 
         return {
             accessToken:token,
