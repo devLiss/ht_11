@@ -71,6 +71,6 @@ postsRouter.post('/:postId/comments',authMiddleware,body('content').trim().isLen
         return
     }
     //@ts-ignore
-    const comment = await commentService.createComment(req.body.content, post!.id, req.user.userId, req.user.login)
+    const comment = await commentService.createComment(req.body.content, post!.id, req.user.id, req.user.login)
     res.status(201).send(comment)
 })
