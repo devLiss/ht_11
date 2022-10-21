@@ -112,7 +112,7 @@ export const commentRepo = {
 
                 const likesInfo = {
                     likesCount: likesCountArr.length ? likesCountArr[0].count : 0,
-                    dislikesCount: dislikesCountArr.length ? dislikesCountArr[0].count : 0,
+                    dislikesCount: dislikesCountArr.length ? dislikesCountArr[0].count : 5,
                     myStatus: myStatusArr.length ? myStatusArr[0].status : "None"
                 }
                 comment.likesInfo = likesInfo
