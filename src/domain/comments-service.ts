@@ -45,8 +45,8 @@ export const commentService = {
     async updateComment(id:string,content:string){
         return await commentRepo.updateComment(id, content);
     },
-    async getCommentsByPostId(postId:string,pageNumber:number,pageSize:number, sortBy:any, sortDirection:any){
-        return await commentRepo.getCommentsByPostId(postId, pageNumber, pageSize, sortBy, sortDirection)
+    async getCommentsByPostId(userId:string, postId:string,pageNumber:number,pageSize:number, sortBy:any, sortDirection:any){
+        return await commentRepo.getCommentsByPostId(userId, postId, pageNumber, pageSize, sortBy, sortDirection)
     },
     async makeLike(commentId:string, userId:ObjectId, status:string){
         const commentIdDb = new ObjectId(commentId)

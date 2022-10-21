@@ -25,18 +25,18 @@ commentsRouter.put('/:commentId/like-status',authMiddleware, likeStatusValidatio
     res.sendStatus(204)
 })
 commentsRouter.get('/:id',/*authMiddleware,*/async(req:Request, res:Response)=>{
-    let currentUserId = null;// user.id
+    let currentUserId = new ObjectId();
     if(req.headers.authorization) {
         const token = req.headers.authorization.split(' ')[1]
         console.log(token)
         const userId = await jwtService.getUserByAccessToken(token);
         console.log("UserId = " + userId)
 
-        // @ts-ignore
-        const user = await userService.getUserById(userId);
-        if(user){currentUserId = user.id}
+        if(userId){
+            const user = await userService.getUserById(userId.toString());
+            if(user){currentUserId = user.id}
+        }
     }
-    //@ts-ignore
     const comment = await commentService.getCommentByID(req.params.id,currentUserId)
     if(!comment){
         res.sendStatus(404)

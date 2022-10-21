@@ -21,7 +21,7 @@ export const commentRepo = {
         const result = await commentsCollection.updateOne({_id:new ObjectId(id)},{$set:{content:content}})
         return result.matchedCount === 1
     },
-    async getCommentsByPostId(postId:string,pageNumber:number,pageSize:number, sortBy:string, sortDirection:any){
+    async getCommentsByPostId(userId:string,postId:string,pageNumber:number,pageSize:number, sortBy:string, sortDirection:any){
         /*const comments = await commentsCollection.find({postId:new ObjectId(postId)},
             {projection:{_id:0,
                 id:"$_id",
@@ -34,7 +34,7 @@ export const commentRepo = {
             .sort( {[sortBy] : sortDirection} )
             .toArray();*/
 
-        const comments = await commentsCollection.aggregate([{
+        const comments = await commentsCollection.aggregate([{$match:{"postId":new ObjectId(postId)}},{
             $lookup: {
                 from: "likes",
                 localField: "_id",
@@ -45,7 +45,7 @@ export const commentRepo = {
                     },
                 },
                     {
-                        $group: {_id:"$status", count:{$sum:1}}
+                        $count: "count"
                     }
                 ],
                 as: "likesCount"
@@ -56,13 +56,13 @@ export const commentRepo = {
                     from: "likes",
                     localField: "_id",
                     foreignField: "commentId",
-                    pipeline:  [{
+                    pipeline: [{
                         $match: {
                             "status": "Dislike"
                         },
                     },
                         {
-                            $count: "dislikesCount"
+                            $count: "count"
                         }
                     ],
                     as: "dislikesCount"
@@ -74,27 +74,45 @@ export const commentRepo = {
                     localField: "_id",
                     foreignField: "commentId",
                     pipeline: [{
-                        $group: { _id: "$status", count: { $sum: 1 } }
-                    }],
-                    as: "likeInfo.myStatus"
+                        $match:{"userId":new ObjectId(userId)}
+                    },{
+                        $project:{_id:0,"status":1}
+                        }],
+                    as: "myStatus"
                 }
             },
             {
                 $project: {
                     _id: 0,
-                    //id: "$_id",
+                    id: "$_id",
                     content: 1,
                     userId: 1,
                     userLogin: 1,
                     createdAt: 1,
-                    "likeInfo.likesCount": "$likesCount",
-                    "likeInfo.dislikesCount": "$dislikesCount.dislikesCount"
+                    "likesInfo.likesCount": "$likesCount",
+                    "likesInfo.dislikesCount": "$dislikesCount.dislikesCount",
+                    "likesInfo.myStatus":"$myStatus"
                 }
             }])
             .skip((pageNumber-1)*pageSize)
             .limit(pageSize)
             .sort( {[sortBy] : sortDirection} )
             .toArray();
+            const temp = comments.map((comment) => {
+                const likesCountArr = comment.likesInfo.likesCount
+                const dislikesCountArr = comment.likesInfo.dislikesCount
+                const myStatusArr = comment.likesInfo.myStatus
+
+                const likesInfo = {
+                    likesCount: likesCountArr.length ? likesCountArr[0].count : 0,
+                    dislikesCount: dislikesCountArr.length ? dislikesCountArr[0].count : 0,
+                    myStatus: myStatusArr.length ? myStatusArr[0].status : "None"
+                }
+                comment.likesInfo = likesInfo
+                return comment
+        });
+            console.log(temp)
+
         const totalCount = await commentsCollection.countDocuments({postId:new ObjectId(postId)});
 
         return {
@@ -102,7 +120,7 @@ export const commentRepo = {
             page:pageNumber,
             pageSize:pageSize,
             totalCount:totalCount,
-            items:comments
+            items:temp
         }
     },
     async deleteAll():Promise<boolean>{

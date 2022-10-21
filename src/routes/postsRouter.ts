@@ -17,6 +17,9 @@ import {
 import {body} from "express-validator";
 import {commentService} from "../domain/comments-service";
 import {authMiddleware} from "../middlewares/authMiddleware";
+import {jwtService} from "../application/jwt-service";
+import {userService} from "../domain/user-service";
+import {ObjectId} from "mongodb";
 
 export const postsRouter = Router({})
 
@@ -59,7 +62,20 @@ postsRouter.get('/:postId/comments', pageNumberSanitizer, pageSizeSanitizer, sor
         return
     }
 
-    const comments =  await commentService.getCommentsByPostId(req.params.postId,+req.query.pageNumber!, +req.query.pageSize!,req.query.sortBy,req.query.sortDirection);
+    let currentUserId = null;
+    if(req.headers.authorization) {
+        const token = req.headers.authorization.split(' ')[1]
+        console.log(token)
+        const userId = await jwtService.getUserByAccessToken(token);
+        console.log("UserId = " + userId)
+
+        if(userId){
+            const user = await userService.getUserById(userId.toString());
+            if(user){currentUserId = user.id}
+        }
+    }
+
+    const comments =  await commentService.getCommentsByPostId(currentUserId,req.params.postId,+req.query.pageNumber!, +req.query.pageSize!,req.query.sortBy,req.query.sortDirection);
     res.status(200).send(comments)
 })
 postsRouter.post('/:postId/comments',authMiddleware,body('content').trim().isLength({min:20, max:300}),inputValidationMiddleware, async(req:Request, res:Response) => {
